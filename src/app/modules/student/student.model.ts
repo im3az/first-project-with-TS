@@ -6,7 +6,7 @@ import {
   TStudent,
   StudentModel,
   TUserName,
-} from './student/student.interface';
+} from './student.interface';
 
 // Schema
 const userNameSchema = new Schema<TUserName>({
@@ -172,7 +172,7 @@ const studentSchema = new Schema<TStudent, StudentModel>({
 // -----------------------------------------------------------------------------
 
 // pre save middleware or hook: will work on create() and save()
-studentSchema.pre('save', function () {f
+studentSchema.pre('save', function () {
   console.log(this, 'pre hook : we will save the data');
 });
 
