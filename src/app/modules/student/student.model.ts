@@ -12,26 +12,19 @@ import {
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
+    required: [true, 'First Name is required'],
     trim: true,
-    required: [true, 'First name is required'],
-    maxlength: [20, 'First name length cannot be more than 20 character'],
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr =
-          value[0].toUpperCase() + value.slice(1).toLowerCase();
-        return firstNameStr === value;
-      },
-      message: '{VALUE} is not in right format',
-    },
+    maxlength: [20, 'Name can not be more than 20 characters'],
   },
-  middleName: { type: String },
+  middleName: {
+    type: String,
+    trim: true,
+  },
   lastName: {
     type: String,
-    required: [true, 'Last name is required'],
-    validate: {
-      validator: (value: string) => validator.isAlpha(value),
-      message: '{VALUE} is not valid',
-    },
+    trim: true,
+    required: [true, 'Last Name is required'],
+    maxlength: [20, 'Name can not be more than 20 characters'],
   },
 });
 
@@ -39,7 +32,7 @@ const guardianSchema = new Schema<TGuardian>({
   fatherName: {
     type: String,
     trim: true,
-    required: [true, 'Father name is required'],
+    required: [true, 'Father Name is required'],
   },
   fatherOccupation: {
     type: String,
@@ -48,22 +41,18 @@ const guardianSchema = new Schema<TGuardian>({
   },
   fatherContactNo: {
     type: String,
-    trim: true,
-    required: [true, 'Contact No is required'],
+    required: [true, 'Father Contact No is required'],
   },
   motherName: {
     type: String,
-    trim: true,
     required: [true, 'Mother Name is required'],
   },
   motherOccupation: {
     type: String,
-    trim: true,
-    required: [true, 'Mother OccupatioN is required'],
+    required: [true, 'Mother occupation is required'],
   },
   motherContactNo: {
     type: String,
-    trim: true,
     required: [true, 'Mother Contact No is required'],
   },
 });
@@ -71,97 +60,93 @@ const guardianSchema = new Schema<TGuardian>({
 const localGuardianSchema = new Schema<TLocalGuardian>({
   name: {
     type: String,
-    trim: true,
-    required: [true, 'Local Guardian name is required'],
+    required: [true, 'Name is required'],
   },
   occupation: {
     type: String,
-    trim: true,
-    required: [true, 'Local Guardian occupation is required'],
+    required: [true, 'Occupation is required'],
   },
   contactNo: {
     type: String,
-    trim: true,
-    required: [true, 'Local Guardian contactNo is required'],
+    required: [true, 'Contact number is required'],
   },
   address: {
     type: String,
-    trim: true,
-    required: [true, 'Local Guardian address is required'],
+    required: [true, 'Address is required'],
   },
 });
 
-const studentSchema = new Schema<TStudent, StudentModel>({
-  id: { type: String, trim: true, required: true, unique: true },
-  name: {
-    type: userNameSchema,
-    trim: true,
-    required: [true, 'Name is required'],
-  },
-  gender: {
-    type: String,
-    trim: true,
-    enum: {
-      values: ['male', 'female', 'other'],
-      message:
-        "The gender can only be one of the following: 'male', 'female', 'other'",
+const studentSchema = new Schema<TStudent, StudentModel>(
+  {
+    id: {
+      type: String,
+      required: [true, 'ID is required'],
+      unique: true,
     },
-    required: true,
-  },
-  dateOfBirth: { type: String },
-  email: {
-    type: String,
-    trim: true,
-    required: [true, 'Email is required'],
-    unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email type',
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
+      unique: true,
+      ref: 'User',
+    },
+    name: {
+      type: userNameSchema,
+      required: [true, 'Name is required'],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other'],
+        message: '{VALUE} is not a valid gender',
+      },
+      required: [true, 'Gender is required'],
+    },
+    dateOfBirth: { type: String },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+    },
+    contactNo: { type: String, required: [true, 'Contact number is required'] },
+    emergencyContactNo: {
+      type: String,
+      required: [true, 'Emergency contact number is required'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message: '{VALUE} is not a valid blood group',
+      },
+    },
+    presentAddress: {
+      type: String,
+      required: [true, 'Present address is required'],
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, 'Permanent address is required'],
+    },
+    guardian: {
+      type: guardianSchema,
+      required: [true, 'Guardian information is required'],
+    },
+    localGuardian: {
+      type: localGuardianSchema,
+      required: [true, 'Local guardian information is required'],
+    },
+    profileImg: { type: String },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
-  contactNo: {
-    type: String,
-    trim: true,
-    required: [true, 'Contact No is required'],
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  emergencyContactNo: {
-    type: String,
-    trim: true,
-    required: [true, 'Emergency Contact No is required'],
-  },
-  bloodGroup: {
-    type: String,
-    trim: true,
-    enum: ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
-  },
-  presentAddress: {
-    type: String,
-    trim: true,
-    required: [true, 'Present Address is required'],
-  },
-  permanentAddress: {
-    type: String,
-    trim: true,
-    required: [true, 'Permanent Address is required'],
-  },
-  guardian: {
-    type: guardianSchema,
-    trim: true,
-    required: [true, 'Guardian name is required'],
-  },
-  localGuardian: {
-    type: localGuardianSchema,
-    trim: true,
-    required: [true, 'Local Guardian name is required'],
-  },
-  profileImage: { type: String },
-  isActive: {
-    type: String,
-    trim: true,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
-});
+);
 
 // creating a custom instance method -----------------------------------------
 
