@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import validator from 'validator';
 import {
   TGuardian,
   TLocalGuardian,
@@ -148,32 +147,31 @@ const studentSchema = new Schema<TStudent, StudentModel>(
   },
 );
 
-// creating a custom instance method -----------------------------------------
-
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-//   return existingUser;
-// };
-// -----------------------------------------------------------------------------
-
-// pre save middleware or hook: will work on create() and save()
-studentSchema.pre('save', function () {
-  console.log(this, 'pre hook : we will save the data');
+// virtual
+studentSchema.virtual('fullName').get(function () {
+  return this.name.firstName + this.name.middleName + this.name.lastName;
 });
 
-// post save middleware or hook
-
-studentSchema.post('save', function () {
-  console.log(this, 'post hook: we saved the data');
+// Query Middleware
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
 });
 
-// creating a custom static method--------------------------------------
+studentSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+studentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
+
+//creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
 };
-// -----------------------------------------------------------------------
-
-// Model
 
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);
