@@ -28,7 +28,7 @@ export type TStudent = {
   password: string;
   name: TUserName;
   gender: 'male' | 'female' | 'other';
-  dateOfBirth?: string;
+  dateOfBirth?: Date;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
@@ -40,20 +40,6 @@ export type TStudent = {
   profileImg?: string;
   isDeleted: boolean;
 };
-
-// for creating instance -----------------------------------------------------
-
-// export interface StudentMethods {
-//   isUserExists(id: string): Promise<TStudent | null>;
-// }
-
-// export type StudentModel = Model<
-//   TStudent,
-//   Record<string, never>,
-//   StudentMethods
-// >;
-
-// ----------------------------------------------------------------------------
 
 // for creating static --------------------------------------------------------
 
