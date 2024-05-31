@@ -57,7 +57,7 @@ export const createStudentValidationSchema = z.object({
           message: "Gender can only be 'male', 'female', or 'other'",
         }),
       }),
-      dateOfBirth: z.date().optional(),
+      dateOfBirth: z.string().optional(),
       email: z.string().email({ message: 'Invalid email address' }),
       contactNo: z.string().min(1, { message: 'Contact number is required' }),
       emergencyContactNo: z
@@ -74,6 +74,7 @@ export const createStudentValidationSchema = z.object({
         .min(1, { message: 'Permanent address is required' }),
       guardian: guardianValidationSchema,
       localGuardian: localGuardianValidationSchema,
+      admissionSemester: z.string(),
       profileImg: z.string().optional(),
     }),
   }),
