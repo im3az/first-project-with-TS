@@ -56,16 +56,17 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!');
     }
 
-    // check if there is any pre requisite courses to update
+    // check if there is any prerequisite courses to update
     if (preRequisiteCourses && preRequisiteCourses.length > 0) {
       // filter out the deleted fields
       const deletedPreRequisites = preRequisiteCourses
-        .filter((el) => el.course && el.isDeleted)
-        .map((el) => el.course);
+        .filter((elem) => elem.course && elem.isDeleted)
+        .map((elem) => elem.course);
 
       const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(
         id,
         {
+          // to remove the course
           $pull: {
             preRequisiteCourses: { course: { $in: deletedPreRequisites } },
           },
@@ -83,9 +84,10 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
 
       // filter out the new course fields
       const newPreRequisites = preRequisiteCourses?.filter(
-        (el) => el.course && !el.isDeleted,
+        (elem) => elem.course && !elem.isDeleted,
       );
 
+      // adding the new courses
       const newPreRequisiteCourses = await Course.findByIdAndUpdate(
         id,
         {
