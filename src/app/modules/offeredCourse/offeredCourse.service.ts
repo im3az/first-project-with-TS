@@ -7,6 +7,7 @@ import { AcademicFaculty } from '../academicFaculty/academicFaculty.model';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { Course } from '../course/course.model';
 import { Faculty } from '../faculty/faculty.model';
+import { hasTimeConflict } from './offeredCourse.utils';
 
 const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
   const {
@@ -73,7 +74,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     );
   }
 
-  // check if the same offered course same section in same registered semester exists
+  // check if the same offered course created a same section in same registered semester exists
 
   const isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection =
     await OfferedCourse.findOne({
@@ -86,6 +87,26 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       `Offered course with same section is already exist!`,
+    );
+  }
+
+  // get the schedules of the faculties
+  const assignedSchedules = await OfferedCourse.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  if (hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `This faculty is not available at that time ! Choose other time or day`,
     );
   }
 
