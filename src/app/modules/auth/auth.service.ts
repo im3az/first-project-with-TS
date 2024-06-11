@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
-  const user = await User.findOne({ id: payload.id });
+  const user = await User.isUserExistsByCustomId(payload.id);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
@@ -29,10 +29,9 @@ const loginUser = async (payload: TLoginUser) => {
   }
 
   //checking if the password is correct
-  const isPasswordMatched = await bcrypt.compare(
-    payload?.password,
-    user?.password,
-  );
+
+  if (!(await User.isPasswordMatched(payload?.password, user?.password)))
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 };
 
 export const AuthServices = {

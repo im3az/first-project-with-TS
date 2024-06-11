@@ -1,3 +1,5 @@
+import { Model } from 'mongoose';
+
 export type TUser = {
   id: string;
   password: string;
@@ -7,4 +9,12 @@ export type TUser = {
   isDeleted: boolean;
 };
 
-
+export interface UserModel extends Model<TUser> {
+  //instance methods for checking if the user exist
+  isUserExistsByCustomId(id: string): Promise<TUser>;
+  //instance methods for checking if passwords are matched
+  isPasswordMatched(
+    plainTextPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean>;
+}
