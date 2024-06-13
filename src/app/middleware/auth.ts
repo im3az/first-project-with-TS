@@ -4,9 +4,9 @@ import httpStatus from 'http-status';
 import AppError from '../error/AppError';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
+import { TUserRole } from '../modules/user/user.interface';
 
-
-const auth = () => {
+const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization; //this will come from front-end but you can set it in postman manually
 
@@ -22,6 +22,13 @@ const auth = () => {
     ) as JwtPayload;
 
     const { role, userId, iat } = decoded;
+
+    if (requiredRoles && !requiredRoles.includes(role)) {
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        'You are not authorized  hi!',
+      );
+    }
 
     req.user = decoded as JwtPayload;
 
